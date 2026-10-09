@@ -14,6 +14,18 @@ const ERRORES = {
   "User already registered": "Ya existe una cuenta con ese correo.",
 };
 
+const PATRON_CORREO = /^[A-Z][A-Za-z0-9._%+-]*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+
+function validarCorreo(correo) {
+  if (correo.length < 10) return "El correo debe tener al menos 10 caracteres.";
+  if (correo.length > 254) return "El correo no puede tener más de 254 caracteres.";
+  if (!correo.includes("@")) return "El correo debe contener @.";
+  if (!PATRON_CORREO.test(correo)) {
+    return "El correo debe empezar con mayúscula y tener un formato válido, por ejemplo Maria@correo.com.";
+  }
+  return null;
+}
+
 let registrando = true;
 
 function mostrarMensaje(texto) {
@@ -44,6 +56,11 @@ formulario.addEventListener("submit", async (evento) => {
 
   try {
     if (registrando) {
+      const errorCorreo = validarCorreo(correo);
+      if (errorCorreo) {
+        mostrarMensaje(errorCorreo);
+        return;
+      }
       const nombre = campoNombre.value.trim();
       const { data, error } = await cliente.auth.signUp({
         email: correo,
