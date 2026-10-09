@@ -83,10 +83,7 @@ function crearCurso() {
   quitar.type = "button";
   quitar.className = "quitar";
   quitar.textContent = "Quitar curso";
-  quitar.addEventListener("click", () => {
-    tarjeta.remove();
-    actualizarDiasDisponibles();
-  });
+  quitar.addEventListener("click", () => tarjeta.remove());
 
   tarjeta.append(crearCampo("Curso", nombre), crearSelectorDias(), horas, quitar);
   return tarjeta;
@@ -130,14 +127,6 @@ function crearTarea() {
     quitar,
   );
   return tarjeta;
-}
-
-function actualizarDiasDisponibles() {
-  const casillas = [...formulario.querySelectorAll(".dia")];
-  const ocupados = new Set(casillas.filter((casilla) => casilla.checked).map((casilla) => casilla.value));
-  for (const casilla of casillas) {
-    casilla.disabled = !casilla.checked && ocupados.has(casilla.value);
-  }
 }
 
 function leerDias(contenedor) {
@@ -191,7 +180,13 @@ formulario.addEventListener("submit", (evento) => {
 });
 
 formulario.addEventListener("change", (evento) => {
-  if (evento.target.classList.contains("dia")) actualizarDiasDisponibles();
+  const casilla = evento.target;
+  if (!casilla.classList.contains("dia") || !casilla.checked) return;
+  const tarjeta = casilla.closest(".curso");
+  if (!tarjeta) return;
+  for (const otra of tarjeta.querySelectorAll(".dia")) {
+    if (otra !== casilla) otra.checked = false;
+  }
 });
 
 tieneTrabajo.addEventListener("change", () => {
@@ -199,12 +194,10 @@ tieneTrabajo.addEventListener("change", () => {
   if (!tieneTrabajo.checked) {
     for (const casilla of document.querySelectorAll("#dias-trabajo .dia")) casilla.checked = false;
   }
-  actualizarDiasDisponibles();
 });
 
 document.getElementById("agregar-curso").addEventListener("click", () => {
   listaCursos.appendChild(crearCurso());
-  actualizarDiasDisponibles();
 });
 
 document.getElementById("agregar-tarea").addEventListener("click", () => {
