@@ -36,6 +36,18 @@ body {
   font-size: 1.75rem;
 }
 
+.bienvenida .titulo-grande {
+  margin: 0;
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.bienvenida .subtitulo {
+  margin: 0.5rem 0 1.5rem;
+  font-size: 0.95rem;
+  color: #718096;
+}
+
 .bienvenida p {
   margin: 0 0 2rem;
   line-height: 1.6;
