@@ -9,6 +9,7 @@ const DIAS = [
 ];
 
 const listaCursos = document.getElementById("lista-cursos");
+const listaTareas = document.getElementById("lista-tareas");
 const tieneTrabajo = document.getElementById("tiene-trabajo");
 const camposTrabajo = document.getElementById("campos-trabajo");
 const mensajeError = document.getElementById("mensaje-error");
@@ -86,6 +87,45 @@ function crearCurso() {
   return tarjeta;
 }
 
+function crearTarea() {
+  const tarjeta = document.createElement("div");
+  tarjeta.className = "curso tarea";
+
+  const titulo = document.createElement("input");
+  titulo.type = "text";
+  titulo.className = "tarea-titulo";
+  titulo.placeholder = "Ej. Informe de laboratorio";
+  titulo.required = true;
+
+  const tipo = document.createElement("select");
+  tipo.className = "tarea-tipo";
+  for (const opcion of ["Tarea individual", "Avance de grupo"]) {
+    const elemento = document.createElement("option");
+    elemento.value = opcion;
+    elemento.textContent = opcion;
+    tipo.appendChild(elemento);
+  }
+
+  const fecha = document.createElement("input");
+  fecha.type = "date";
+  fecha.className = "tarea-fecha";
+  fecha.required = true;
+
+  const quitar = document.createElement("button");
+  quitar.type = "button";
+  quitar.className = "quitar";
+  quitar.textContent = "Quitar tarea";
+  quitar.addEventListener("click", () => tarjeta.remove());
+
+  tarjeta.append(
+    crearCampo("Tarea", titulo),
+    crearCampo("Tipo", tipo),
+    crearCampo("Fecha límite", fecha),
+    quitar,
+  );
+  return tarjeta;
+}
+
 function leerDias(contenedor) {
   return [...contenedor.querySelectorAll(".dia:checked")].map((casilla) => casilla.value);
 }
@@ -126,7 +166,13 @@ formulario.addEventListener("submit", (evento) => {
     return;
   }
 
-  localStorage.setItem("horario", JSON.stringify({ cursos, trabajo }));
+  const tareas = [...listaTareas.querySelectorAll(".tarea")].map((tarjeta) => ({
+    titulo: tarjeta.querySelector(".tarea-titulo").value.trim(),
+    tipo: tarjeta.querySelector(".tarea-tipo").value,
+    fecha: tarjeta.querySelector(".tarea-fecha").value,
+  }));
+
+  localStorage.setItem("horario", JSON.stringify({ cursos, trabajo, tareas }));
   window.location.href = "dashboard.html";
 });
 
@@ -138,8 +184,13 @@ document.getElementById("agregar-curso").addEventListener("click", () => {
   listaCursos.appendChild(crearCurso());
 });
 
+document.getElementById("agregar-tarea").addEventListener("click", () => {
+  listaTareas.appendChild(crearTarea());
+});
+
 const nombre = localStorage.getItem("nombreAlumno");
 document.getElementById("saludo").textContent = nombre ? `Hola, ${nombre}` : "Hola";
 
 listaCursos.appendChild(crearCurso());
+listaTareas.appendChild(crearTarea());
 document.getElementById("dias-trabajo").appendChild(crearSelectorDias());

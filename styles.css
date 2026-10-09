@@ -358,7 +358,9 @@ dialog::backdrop {
 }
 
 .horario-form input[type="text"],
-.horario-form input[type="time"] {
+.horario-form input[type="time"],
+.horario-form input[type="date"],
+.horario-form select {
   width: 100%;
   padding: 0.6rem 0.8rem;
   border: 1px solid #d0d7e6;
@@ -368,7 +370,9 @@ dialog::backdrop {
 }
 
 .horario-form input[type="text"]:focus,
-.horario-form input[type="time"]:focus {
+.horario-form input[type="time"]:focus,
+.horario-form input[type="date"]:focus,
+.horario-form select:focus {
   outline: 2px solid #1f4fd8;
   outline-offset: 1px;
 }

@@ -1,14 +1,18 @@
 const INICIO_DIA = 7 * 60;
 const FIN_DIA = 22 * 60;
-const CLAVE_ENTREGABLES = "entregables";
 
 const CLAVES_DIA = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
 
-function horarioDeHoy() {
+function leerHorario() {
   const guardado = localStorage.getItem("horario");
-  if (!guardado) return null;
+  return guardado ? JSON.parse(guardado) : null;
+}
 
-  const { cursos, trabajo } = JSON.parse(guardado);
+function horarioDeHoy() {
+  const horario = leerHorario();
+  if (!horario) return null;
+
+  const { cursos, trabajo } = horario;
   const clave = CLAVES_DIA[new Date().getDay()];
   const bloques = cursos
     .filter((curso) => curso.dias.includes(clave))
@@ -20,7 +24,7 @@ function horarioDeHoy() {
   return bloques;
 }
 
-let entregables = cargarEntregables();
+let entregables = leerHorario()?.tareas ?? [];
 
 function aMinutos(hora) {
   const [horas, minutos] = hora.split(":").map(Number);
@@ -77,19 +81,6 @@ function renderCargaDelDia() {
     : `Tienes ${formatearDuracion(libre)} libres hoy.`;
 }
 
-function formatoISO(fecha) {
-  const anio = fecha.getFullYear();
-  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
-  const dia = String(fecha.getDate()).padStart(2, "0");
-  return `${anio}-${mes}-${dia}`;
-}
-
-function fechaRelativa(dias) {
-  const fecha = new Date();
-  fecha.setDate(fecha.getDate() + dias);
-  return formatoISO(fecha);
-}
-
 function diasHasta(fechaISO) {
   const [anio, mes, dia] = fechaISO.split("-").map(Number);
   const hoy = new Date();
@@ -103,21 +94,10 @@ function textoVencimiento(dias) {
   return `Vence en ${dias} días`;
 }
 
-function cargarEntregables() {
-  const guardados = localStorage.getItem(CLAVE_ENTREGABLES);
-  if (guardados) return JSON.parse(guardados);
-
-  const semilla = [
-    { tipo: "Avance de grupo", titulo: "Avance de maqueta del proyecto", fecha: fechaRelativa(2) },
-    { tipo: "Tarea individual", titulo: "Ensayo de Redacción", fecha: fechaRelativa(1) },
-    { tipo: "Tarea individual", titulo: "Práctica de Estadística", fecha: fechaRelativa(5) },
-  ];
-  localStorage.setItem(CLAVE_ENTREGABLES, JSON.stringify(semilla));
-  return semilla;
-}
-
-function guardarEntregables() {
-  localStorage.setItem(CLAVE_ENTREGABLES, JSON.stringify(entregables));
+function guardarTareas() {
+  const horario = leerHorario() ?? { cursos: [], trabajo: null, tareas: [] };
+  horario.tareas = entregables;
+  localStorage.setItem("horario", JSON.stringify(horario));
 }
 
 function renderEntregables() {
@@ -176,7 +156,7 @@ formulario.addEventListener("submit", (evento) => {
     titulo: document.getElementById("titulo").value.trim(),
     fecha: document.getElementById("fecha-limite").value,
   });
-  guardarEntregables();
+  guardarTareas();
   renderEntregables();
   dialogo.close();
 });
