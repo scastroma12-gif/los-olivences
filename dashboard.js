@@ -2,12 +2,23 @@ const INICIO_DIA = 7 * 60;
 const FIN_DIA = 22 * 60;
 const CLAVE_ENTREGABLES = "entregables";
 
-const horarioHoy = [
-  { tipo: "clase", nombre: "Clase de Estadística", inicio: "08:00", fin: "10:00" },
-  { tipo: "clase", nombre: "Clase de Redacción", inicio: "10:30", fin: "12:30" },
-  { tipo: "trabajo", nombre: "Jornada laboral", inicio: "14:00", fin: "18:00" },
-  { tipo: "clase", nombre: "Clase de Psicología", inicio: "19:00", fin: "21:00" },
-];
+const CLAVES_DIA = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
+
+function horarioDeHoy() {
+  const guardado = localStorage.getItem("horario");
+  if (!guardado) return null;
+
+  const { cursos, trabajo } = JSON.parse(guardado);
+  const clave = CLAVES_DIA[new Date().getDay()];
+  const bloques = cursos
+    .filter((curso) => curso.dias.includes(clave))
+    .map((curso) => ({ tipo: "clase", nombre: curso.nombre, inicio: curso.inicio, fin: curso.fin }));
+
+  if (trabajo && trabajo.dias.includes(clave)) {
+    bloques.push({ tipo: "trabajo", nombre: "Jornada laboral", inicio: trabajo.inicio, fin: trabajo.fin });
+  }
+  return bloques;
+}
 
 let entregables = cargarEntregables();
 
@@ -30,7 +41,14 @@ function renderCargaDelDia() {
   const linea = document.getElementById("linea-tiempo");
   linea.replaceChildren();
 
-  const bloques = horarioHoy
+  const horario = horarioDeHoy();
+  const resumen = document.getElementById("horas-libres");
+  if (horario === null) {
+    resumen.textContent = "Registra tu horario para ver tu carga del día.";
+    return;
+  }
+
+  const bloques = horario
     .map((bloque) => ({ ...bloque, ini: aMinutos(bloque.inicio), fin: aMinutos(bloque.fin) }))
     .sort((a, b) => a.ini - b.ini);
 
@@ -54,7 +72,9 @@ function renderCargaDelDia() {
   }
 
   const libre = FIN_DIA - INICIO_DIA - ocupado;
-  document.getElementById("horas-libres").textContent = `Tienes ${formatearDuracion(libre)} libres hoy.`;
+  resumen.textContent = horario.length === 0
+    ? "Hoy es tu día libre."
+    : `Tienes ${formatearDuracion(libre)} libres hoy.`;
 }
 
 function formatoISO(fecha) {

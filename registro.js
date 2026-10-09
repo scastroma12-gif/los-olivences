@@ -7,5 +7,5 @@ formulario.addEventListener("submit", (evento) => {
   if (!nombre) return;
 
   localStorage.setItem("nombreAlumno", nombre);
-  window.location.href = "dashboard.html";
+  window.location.href = "horario.html";
 });

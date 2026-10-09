@@ -345,3 +345,146 @@ dialog::backdrop {
   margin-top: 0;
   padding: 0.6rem 1rem;
 }
+
+.descripcion {
+  margin: 0;
+  color: #4a5568;
+}
+
+.horario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.horario-form input[type="text"],
+.horario-form input[type="time"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #d0d7e6;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.horario-form input[type="text"]:focus,
+.horario-form input[type="time"]:focus {
+  outline: 2px solid #1f4fd8;
+  outline-offset: 1px;
+}
+
+.curso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #d0d7e6;
+  border-radius: 12px;
+}
+
+.etiqueta-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.etiqueta-leyenda {
+  padding: 0;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.horas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.dias {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dia-chip {
+  position: relative;
+  cursor: pointer;
+}
+
+.dia-chip input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dia-chip span {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #d0d7e6;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.dia-chip input:checked + span {
+  background: #1f4fd8;
+  border-color: #1f4fd8;
+  color: #ffffff;
+}
+
+.dia-chip input:focus-visible + span {
+  outline: 2px solid #1f4fd8;
+  outline-offset: 2px;
+}
+
+.quitar {
+  align-self: flex-end;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  color: #c2410c;
+  cursor: pointer;
+}
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.casilla input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.trabajo-campos {
+  margin-top: 0.75rem;
+}
+
+.error {
+  margin: 0;
+  font-weight: 600;
+  color: #c2410c;
+}

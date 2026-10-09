@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi horario · Universidad César Vallejo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header>
+      <p class="institucion">Universidad César Vallejo</p>
+      <h1 id="saludo">Hola</h1>
+      <p class="descripcion">Cuéntanos tu semana para calcular tus horas libres.</p>
+    </header>
+
+    <form id="formulario-horario" class="horario-form">
+      <section class="tarjeta">
+        <h2>Mis cursos</h2>
+        <div id="lista-cursos"></div>
+        <button type="button" id="agregar-curso" class="boton boton-secundario">+ Agregar curso</button>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Mi trabajo</h2>
+        <label class="casilla">
+          <input type="checkbox" id="tiene-trabajo">
+          Tengo jornada laboral
+        </label>
+        <div id="campos-trabajo" class="trabajo-campos" hidden>
+          <div id="dias-trabajo"></div>
+          <div class="horas">
+            <label class="etiqueta-campo">Desde<input type="time" id="trabajo-inicio"></label>
+            <label class="etiqueta-campo">Hasta<input type="time" id="trabajo-fin"></label>
+          </div>
+        </div>
+      </section>
+
+      <p id="mensaje-error" class="error" hidden></p>
+      <button type="submit" class="boton boton-principal">Guardar y continuar</button>
+    </form>
+  </main>
+  <script src="horario.js"></script>
+</body>
+</html>
