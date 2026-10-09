@@ -44,6 +44,10 @@ formulario.addEventListener("submit", async (evento) => {
     }
 
     const nombre = registrando ? campoNombre.value.trim() : null;
+    if (registrando && !nombre) {
+      mostrarMensaje("Ingresa tu nombre completo.");
+      return;
+    }
     const alumno = await entrarConDni(dni, nombre);
     if (!alumno) {
       mostrarMensaje("No existe una cuenta con ese DNI. Regístrate primero.");
