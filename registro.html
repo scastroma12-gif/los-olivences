@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de estudiante · Universidad César Vallejo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="bienvenida">
+    <p class="institucion">Universidad César Vallejo</p>
+    <h1>Regístrate en tu aula virtual</h1>
+    <p>Ingresa tu nombre para continuar.</p>
+    <form id="formulario-registro" class="formulario">
+      <label for="nombre">Nombre completo</label>
+      <input id="nombre" name="nombre" type="text" required autocomplete="name" placeholder="Ej. María López">
+      <button type="submit" class="boton boton-principal">Registrarme</button>
+    </form>
+    <p id="mensaje" class="mensaje" hidden></p>
+    <a class="volver" href="index.html">Volver al inicio</a>
+  </main>
+  <script src="registro.js"></script>
+</body>
+</html>
