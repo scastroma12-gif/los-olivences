@@ -91,7 +91,8 @@ body {
   font-size: 0.9rem;
 }
 
-.formulario input {
+.formulario input,
+.formulario select {
   padding: 0.75rem 0.9rem;
   border: 1px solid #d0d7e6;
   border-radius: 10px;
@@ -108,12 +109,6 @@ body {
   border: none;
   font-size: 1rem;
   cursor: pointer;
-}
-
-.mensaje {
-  margin-top: 1.5rem;
-  font-weight: 600;
-  color: #1f7a3d;
 }
 
 .volver {
@@ -144,4 +139,197 @@ body {
 
 .red:hover {
   background: #f4f6fb;
+}
+
+.dashboard {
+  width: 100%;
+  max-width: 640px;
+  padding: 2rem 1rem 6rem;
+}
+
+.dashboard h1 {
+  margin: 0.25rem 0;
+  font-size: 1.6rem;
+}
+
+.fecha {
+  margin: 0;
+  color: #4a5568;
+  text-transform: capitalize;
+}
+
+.tarjeta {
+  margin-bottom: 1.25rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.tarjeta h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.linea-tiempo {
+  position: relative;
+  height: 48px;
+  background: #d6f5e1;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bloque {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.bloque.clase {
+  background: #1f4fd8;
+}
+
+.bloque.trabajo {
+  background: #f59e0b;
+}
+
+.escala {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.resumen {
+  margin: 1rem 0 0.75rem;
+  font-weight: 600;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.punto {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+}
+
+.punto.clase {
+  background: #1f4fd8;
+}
+
+.punto.trabajo {
+  background: #f59e0b;
+}
+
+.punto.libre {
+  background: #d6f5e1;
+}
+
+.entregables {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entregable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eef1f7;
+}
+
+.entregable:last-child {
+  border-bottom: none;
+}
+
+.etiqueta {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1f4fd8;
+}
+
+.titulo {
+  margin: 0.2rem 0 0;
+  font-weight: 600;
+}
+
+.vence {
+  font-size: 0.85rem;
+  color: #4a5568;
+  white-space: nowrap;
+}
+
+.vence.urgente {
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.vacio {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.boton-flotante {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background: #1f4fd8;
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(31, 79, 216, 0.35);
+}
+
+.boton-flotante:hover {
+  background: #1a43b8;
+}
+
+dialog {
+  width: min(90vw, 380px);
+  padding: 1.5rem;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+dialog h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+dialog::backdrop {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.acciones-dialogo {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.acciones-dialogo .boton {
+  margin-top: 0;
+  padding: 0.6rem 1rem;
 }

@@ -1,6 +1,5 @@
 const formulario = document.getElementById("formulario-registro");
 const campoNombre = document.getElementById("nombre");
-const mensaje = document.getElementById("mensaje");
 
 formulario.addEventListener("submit", (evento) => {
   evento.preventDefault();
@@ -8,7 +7,5 @@ formulario.addEventListener("submit", (evento) => {
   if (!nombre) return;
 
   localStorage.setItem("nombreAlumno", nombre);
-  mensaje.textContent = `¡Registro exitoso, ${nombre}!`;
-  mensaje.hidden = false;
-  formulario.reset();
+  window.location.href = "dashboard.html";
 });

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Día · Universidad César Vallejo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header>
+      <p class="institucion">Universidad César Vallejo</p>
+      <h1 id="saludo">Hola, estudiante</h1>
+      <p id="fecha" class="fecha"></p>
+    </header>
+
+    <section class="tarjeta">
+      <h2>Carga del día</h2>
+      <div id="linea-tiempo" class="linea-tiempo" role="img" aria-label="Línea de tiempo de tu día"></div>
+      <div class="escala"><span>07:00</span><span>22:00</span></div>
+      <p id="horas-libres" class="resumen"></p>
+      <ul class="leyenda">
+        <li><span class="punto clase"></span>Clases</li>
+        <li><span class="punto trabajo"></span>Trabajo</li>
+        <li><span class="punto libre"></span>Libre</li>
+      </ul>
+    </section>
+
+    <section class="tarjeta">
+      <h2>Entregables prioritarios</h2>
+      <ul id="lista-entregables" class="entregables"></ul>
+    </section>
+
+    <button id="boton-agregar" class="boton-flotante" aria-label="Registrar trabajo o avance">+</button>
+
+    <dialog id="dialogo-agregar">
+      <form id="formulario-agregar" class="formulario">
+        <h2>Registrar trabajo o avance</h2>
+        <label for="tipo">Tipo</label>
+        <select id="tipo" required>
+          <option value="Tarea individual">Tarea individual</option>
+          <option value="Avance de grupo">Avance de grupo</option>
+        </select>
+        <label for="titulo">Título</label>
+        <input id="titulo" type="text" required placeholder="Ej. Informe de laboratorio">
+        <label for="fecha-limite">Fecha límite</label>
+        <input id="fecha-limite" type="date" required>
+        <div class="acciones-dialogo">
+          <button type="button" id="cancelar" class="boton boton-secundario">Cancelar</button>
+          <button type="submit" class="boton boton-principal">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+  <script src="dashboard.js"></script>
+</body>
+</html>
