@@ -66,11 +66,13 @@ function crearCurso() {
   const inicio = document.createElement("input");
   inicio.type = "time";
   inicio.className = "curso-inicio";
+  inicio.lang = "en-US";
   inicio.required = true;
 
   const fin = document.createElement("input");
   fin.type = "time";
   fin.className = "curso-fin";
+  fin.lang = "en-US";
   fin.required = true;
 
   const horas = document.createElement("div");

@@ -31,6 +31,12 @@ function aMinutos(hora) {
   return horas * 60 + minutos;
 }
 
+function formatearHora(hora) {
+  const [horas, minutos] = hora.split(":").map(Number);
+  const periodo = horas < 12 ? "AM" : "PM";
+  return `${horas % 12 || 12}:${String(minutos).padStart(2, "0")} ${periodo}`;
+}
+
 function porcentaje(minutos) {
   return ((minutos - INICIO_DIA) / (FIN_DIA - INICIO_DIA)) * 100;
 }
@@ -71,7 +77,7 @@ function renderCargaDelDia() {
     elemento.className = `bloque ${bloque.tipo}`;
     elemento.style.left = `${porcentaje(ini)}%`;
     elemento.style.width = `${porcentaje(fin) - porcentaje(ini)}%`;
-    elemento.title = `${bloque.nombre} (${bloque.inicio}–${bloque.fin})`;
+    elemento.title = `${bloque.nombre} (${formatearHora(bloque.inicio)}–${formatearHora(bloque.fin)})`;
     linea.appendChild(elemento);
   }
 
