@@ -3,7 +3,7 @@ const FIN_DIA = 22 * 60;
 
 const CLAVES_DIA = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
 
-let alumnoId = null;
+let dni = null;
 let cursos = [];
 let trabajo = null;
 let entregables = [];
@@ -150,49 +150,43 @@ document.getElementById("cancelar").addEventListener("click", () => dialogo.clos
 formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
   const nueva = {
-    alumno_id: alumnoId,
     tipo: document.getElementById("tipo").value,
     titulo: document.getElementById("titulo").value.trim(),
     fecha: document.getElementById("fecha-limite").value,
   };
 
-  const { data, error } = await cliente
-    .from("tareas")
-    .insert(nueva)
-    .select("tipo, titulo, fecha")
-    .single();
+  const { error } = await cliente.rpc("agregar_tarea", {
+    p_dni: dni,
+    p_titulo: nueva.titulo,
+    p_tipo: nueva.tipo,
+    p_fecha: nueva.fecha,
+  });
   if (error) {
     console.error(error);
     alert("No se pudo guardar la tarea. Intenta de nuevo.");
     return;
   }
 
-  entregables.push(data);
+  entregables.push(nueva);
   renderEntregables();
   dialogo.close();
 });
 
 async function iniciar() {
-  const alumno = await obtenerAlumno();
+  dni = dniActual();
+  const alumno = dni ? await entrarConDni(dni) : null;
   if (!alumno) {
     window.location.href = "registro.html";
     return;
   }
-  alumnoId = alumno.id;
-  document.getElementById("saludo").textContent = `Hola, ${alumno.nombre}`;
+  document.getElementById("saludo").textContent = `Hola, ${alumno.alumno_nombre}`;
 
-  const [cursosRes, trabajoRes, tareasRes] = await Promise.all([
-    cliente.from("cursos").select("nombre, dia, inicio, fin").eq("alumno_id", alumnoId).order("inicio"),
-    cliente.from("trabajo").select("dias, inicio, fin").eq("alumno_id", alumnoId).maybeSingle(),
-    cliente.from("tareas").select("tipo, titulo, fecha").eq("alumno_id", alumnoId).order("fecha"),
-  ]);
-  for (const res of [cursosRes, trabajoRes, tareasRes]) {
-    if (res.error) throw res.error;
-  }
+  const { data, error } = await cliente.rpc("obtener_horario", { p_dni: dni });
+  if (error) throw error;
 
-  cursos = cursosRes.data;
-  trabajo = trabajoRes.data;
-  entregables = tareasRes.data;
+  cursos = data.cursos;
+  trabajo = data.trabajo;
+  entregables = data.tareas;
 
   renderCargaDelDia();
   renderEntregables();

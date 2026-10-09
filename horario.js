@@ -148,54 +148,25 @@ function validarBloque(bloque, descripcion) {
   return null;
 }
 
-async function reemplazarHorario(alumnoId, cursos, trabajo, tareas) {
-  const tablas = ["cursos", "trabajo", "tareas"];
-  for (const tabla of tablas) {
-    const { error } = await cliente.from(tabla).delete().eq("alumno_id", alumnoId);
-    if (error) throw error;
-  }
-
-  if (cursos.length > 0) {
-    const { error } = await cliente.from("cursos").insert(
-      cursos.map((curso) => ({
-        alumno_id: alumnoId,
-        nombre: curso.nombre,
-        dia: curso.dias[0],
-        inicio: curso.inicio,
-        fin: curso.fin,
-      })),
-    );
-    if (error) throw error;
-  }
-
-  if (trabajo) {
-    const { error } = await cliente.from("trabajo").insert({
-      alumno_id: alumnoId,
-      dias: trabajo.dias,
-      inicio: trabajo.inicio,
-      fin: trabajo.fin,
-    });
-    if (error) throw error;
-  }
-
-  if (tareas.length > 0) {
-    const { error } = await cliente.from("tareas").insert(
-      tareas.map((tarea) => ({ alumno_id: alumnoId, ...tarea })),
-    );
-    if (error) throw error;
-  }
+async function reemplazarHorario(dni, cursos, trabajo, tareas) {
+  const { error } = await cliente.rpc("guardar_horario", {
+    p_dni: dni,
+    p_cursos: cursos.map((curso) => ({
+      nombre: curso.nombre,
+      dia: curso.dias[0],
+      inicio: curso.inicio,
+      fin: curso.fin,
+    })),
+    p_trabajo: trabajo,
+    p_tareas: tareas,
+  });
+  if (error) throw error;
 }
 
-async function cargarHorario(alumnoId) {
-  const [cursosRes, trabajoRes, tareasRes] = await Promise.all([
-    cliente.from("cursos").select("nombre, dia, inicio, fin").eq("alumno_id", alumnoId).order("inicio"),
-    cliente.from("trabajo").select("dias, inicio, fin").eq("alumno_id", alumnoId).maybeSingle(),
-    cliente.from("tareas").select("titulo, tipo, fecha").eq("alumno_id", alumnoId).order("fecha"),
-  ]);
-  for (const res of [cursosRes, trabajoRes, tareasRes]) {
-    if (res.error) throw res.error;
-  }
-  return { cursos: cursosRes.data, trabajo: trabajoRes.data, tareas: tareasRes.data };
+async function cargarHorario(dni) {
+  const { data, error } = await cliente.rpc("obtener_horario", { p_dni: dni });
+  if (error) throw error;
+  return data;
 }
 
 formulario.addEventListener("submit", async (evento) => {
@@ -235,8 +206,7 @@ formulario.addEventListener("submit", async (evento) => {
   }));
 
   try {
-    const alumno = await obtenerAlumno();
-    await reemplazarHorario(alumno.id, cursos, trabajo, tareas);
+    await reemplazarHorario(dniActual(), cursos, trabajo, tareas);
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error(error);
@@ -271,21 +241,22 @@ document.getElementById("agregar-tarea").addEventListener("click", () => {
 });
 
 async function iniciar() {
-  const alumno = await obtenerAlumno();
+  const dni = dniActual();
+  const alumno = dni ? await entrarConDni(dni) : null;
   if (!alumno) {
     window.location.href = "registro.html";
     return;
   }
-  saludo.textContent = `Hola, ${alumno.nombre}`;
+  saludo.textContent = `Hola, ${alumno.alumno_nombre}`;
 
-  const { cursos, trabajo, tareas } = await cargarHorario(alumno.id);
+  const { cursos, trabajo, tareas } = await cargarHorario(dni);
 
   for (const curso of cursos) {
     listaCursos.appendChild(crearCurso({
       nombre: curso.nombre,
       dias: [curso.dia],
-      inicio: curso.inicio.slice(0, 5),
-      fin: curso.fin.slice(0, 5),
+      inicio: curso.inicio,
+      fin: curso.fin,
     }));
   }
   if (cursos.length === 0) listaCursos.appendChild(crearCurso());
@@ -293,8 +264,8 @@ async function iniciar() {
   if (trabajo) {
     tieneTrabajo.checked = true;
     camposTrabajo.hidden = false;
-    document.getElementById("trabajo-inicio").value = trabajo.inicio.slice(0, 5);
-    document.getElementById("trabajo-fin").value = trabajo.fin.slice(0, 5);
+    document.getElementById("trabajo-inicio").value = trabajo.inicio;
+    document.getElementById("trabajo-fin").value = trabajo.fin;
   }
   document.getElementById("dias-trabajo").appendChild(crearSelectorDias(trabajo?.dias));
 

@@ -43,24 +43,18 @@ function llenarTabla(cuerpo, filas) {
 }
 
 async function mostrarDatos() {
-  const alumno = await obtenerAlumno();
-  if (!alumno) {
+  const dni = dniActual();
+  if (!dni) {
     document.getElementById("sin-sesion").hidden = false;
     return;
   }
 
-  const [cursosRes, trabajoRes, tareasRes] = await Promise.all([
-    cliente.from("cursos").select("nombre, dia, inicio, fin").eq("alumno_id", alumno.id).order("inicio"),
-    cliente.from("trabajo").select("dias, inicio, fin").eq("alumno_id", alumno.id).maybeSingle(),
-    cliente.from("tareas").select("titulo, tipo, fecha").eq("alumno_id", alumno.id).order("fecha"),
-  ]);
-  for (const res of [cursosRes, trabajoRes, tareasRes]) {
-    if (res.error) throw res.error;
-  }
+  const { data, error } = await cliente.rpc("obtener_horario", { p_dni: dni });
+  if (error) throw error;
 
   llenarTabla(
     document.getElementById("tabla-cursos"),
-    cursosRes.data.map((curso) => [
+    data.cursos.map((curso) => [
       curso.nombre,
       ETIQUETAS_DIA[curso.dia],
       formatearHora(curso.inicio),
@@ -68,7 +62,7 @@ async function mostrarDatos() {
     ]),
   );
 
-  const trabajo = trabajoRes.data;
+  const trabajo = data.trabajo;
   llenarTabla(
     document.getElementById("tabla-trabajo"),
     trabajo
@@ -82,7 +76,7 @@ async function mostrarDatos() {
 
   llenarTabla(
     document.getElementById("tabla-tareas"),
-    tareasRes.data.map((tarea) => [tarea.titulo, tarea.tipo, formatearFecha(tarea.fecha)]),
+    data.tareas.map((tarea) => [tarea.titulo, tarea.tipo, formatearFecha(tarea.fecha)]),
   );
 
   document.getElementById("contenido-datos").hidden = false;
