@@ -114,6 +114,7 @@ function crearTarea() {
   const fecha = document.createElement("input");
   fecha.type = "date";
   fecha.className = "tarea-fecha";
+  soloCalendario(fecha);
   fecha.required = true;
 
   const quitar = document.createElement("button");

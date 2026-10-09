@@ -145,6 +145,8 @@ function renderEntregables() {
   }
 }
 
+soloCalendario(document.getElementById("fecha-limite"));
+
 const dialogo = document.getElementById("dialogo-agregar");
 const formulario = document.getElementById("formulario-agregar");
 
