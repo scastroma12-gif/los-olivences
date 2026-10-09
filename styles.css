@@ -454,6 +454,14 @@ dialog::backdrop {
   color: #ffffff;
 }
 
+.dia-chip input:disabled {
+  cursor: not-allowed;
+}
+
+.dia-chip input:disabled + span {
+  opacity: 0.35;
+}
+
 .dia-chip input:focus-visible + span {
   outline: 2px solid #1f4fd8;
   outline-offset: 2px;
