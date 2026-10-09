@@ -14,7 +14,7 @@ const ERRORES = {
   "User already registered": "Ya existe una cuenta con ese DNI.",
 };
 
-const PATRON_DNI = /^\d{8}$/;
+const PATRON_DNI = /^(\d{7}|\d{8}|\d{10})$/;
 
 function correoDeDni(dni) {
   return `${dni}@alumnos.ucv.pe`;
@@ -50,7 +50,7 @@ formulario.addEventListener("submit", async (evento) => {
 
   try {
     if (!PATRON_DNI.test(dni)) {
-      mostrarMensaje("El DNI debe tener exactamente 8 números.");
+      mostrarMensaje("El DNI debe tener 7, 8 o 10 números.");
       return;
     }
 
