@@ -9,15 +9,25 @@
 <body>
   <main class="bienvenida">
     <p class="institucion">Universidad César Vallejo</p>
-    <h1>Regístrate en tu aula virtual</h1>
-    <p>Ingresa tu nombre para continuar.</p>
-    <form id="formulario-registro" class="formulario">
-      <label for="nombre">Nombre completo</label>
-      <input id="nombre" name="nombre" type="text" required autocomplete="name" placeholder="Ej. María López">
-      <button type="submit" class="boton boton-principal">Registrarme</button>
+    <h1 id="titulo">Regístrate en tu aula virtual</h1>
+    <p id="descripcion">Crea tu cuenta para continuar.</p>
+    <form id="formulario-acceso" class="formulario">
+      <div id="campo-nombre">
+        <label for="nombre">Nombre completo</label>
+        <input id="nombre" type="text" autocomplete="name" placeholder="Ej. María López">
+      </div>
+      <label for="correo">Correo</label>
+      <input id="correo" type="email" required autocomplete="email">
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" required minlength="6" autocomplete="current-password">
+      <button type="submit" id="boton-enviar" class="boton boton-principal">Crear cuenta</button>
     </form>
+    <p id="mensaje" class="error" hidden></p>
+    <button type="button" id="cambiar-modo" class="enlace">¿Ya tienes cuenta? Inicia sesión</button>
     <a class="volver" href="index.html">Volver al inicio</a>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-cliente.js"></script>
   <script src="registro.js"></script>
 </body>
 </html>

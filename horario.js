@@ -8,6 +8,7 @@ const DIAS = [
   { clave: "dom", etiqueta: "Dom" },
 ];
 
+const saludo = document.getElementById("saludo");
 const listaCursos = document.getElementById("lista-cursos");
 const listaTareas = document.getElementById("lista-tareas");
 const tieneTrabajo = document.getElementById("tiene-trabajo");
@@ -15,7 +16,7 @@ const camposTrabajo = document.getElementById("campos-trabajo");
 const mensajeError = document.getElementById("mensaje-error");
 const formulario = document.getElementById("formulario-horario");
 
-function crearSelectorDias() {
+function crearSelectorDias(seleccionados = []) {
   const grupo = document.createElement("fieldset");
   grupo.className = "dias";
 
@@ -33,6 +34,7 @@ function crearSelectorDias() {
     casilla.type = "checkbox";
     casilla.className = "dia";
     casilla.value = dia.clave;
+    casilla.checked = seleccionados.includes(dia.clave);
 
     const texto = document.createElement("span");
     texto.textContent = dia.etiqueta;
@@ -53,7 +55,7 @@ function crearCampo(texto, control) {
   return etiqueta;
 }
 
-function crearCurso() {
+function crearCurso(datos = {}) {
   const tarjeta = document.createElement("div");
   tarjeta.className = "curso";
 
@@ -62,18 +64,21 @@ function crearCurso() {
   nombre.className = "curso-nombre";
   nombre.placeholder = "Ej. Estadística";
   nombre.required = true;
+  nombre.value = datos.nombre ?? "";
 
   const inicio = document.createElement("input");
   inicio.type = "time";
   inicio.className = "curso-inicio";
   inicio.lang = "en-US";
   inicio.required = true;
+  inicio.value = datos.inicio ?? "";
 
   const fin = document.createElement("input");
   fin.type = "time";
   fin.className = "curso-fin";
   fin.lang = "en-US";
   fin.required = true;
+  fin.value = datos.fin ?? "";
 
   const horas = document.createElement("div");
   horas.className = "horas";
@@ -85,11 +90,11 @@ function crearCurso() {
   quitar.textContent = "Quitar curso";
   quitar.addEventListener("click", () => tarjeta.remove());
 
-  tarjeta.append(crearCampo("Curso", nombre), crearSelectorDias(), horas, quitar);
+  tarjeta.append(crearCampo("Curso", nombre), crearSelectorDias(datos.dias), horas, quitar);
   return tarjeta;
 }
 
-function crearTarea() {
+function crearTarea(datos = {}) {
   const tarjeta = document.createElement("div");
   tarjeta.className = "curso tarea";
 
@@ -98,6 +103,7 @@ function crearTarea() {
   titulo.className = "tarea-titulo";
   titulo.placeholder = "Ej. Informe de laboratorio";
   titulo.required = true;
+  titulo.value = datos.titulo ?? "";
 
   const tipo = document.createElement("select");
   tipo.className = "tarea-tipo";
@@ -107,12 +113,14 @@ function crearTarea() {
     elemento.textContent = opcion;
     tipo.appendChild(elemento);
   }
+  tipo.value = datos.tipo ?? "Tarea individual";
 
   const fecha = document.createElement("input");
   fecha.type = "date";
   fecha.className = "tarea-fecha";
   soloCalendario(fecha);
   fecha.required = true;
+  fecha.value = datos.fecha ?? "";
 
   const quitar = document.createElement("button");
   quitar.type = "button";
@@ -140,8 +148,59 @@ function validarBloque(bloque, descripcion) {
   return null;
 }
 
-formulario.addEventListener("submit", (evento) => {
+async function reemplazarHorario(alumnoId, cursos, trabajo, tareas) {
+  const tablas = ["cursos", "trabajo", "tareas"];
+  for (const tabla of tablas) {
+    const { error } = await cliente.from(tabla).delete().eq("alumno_id", alumnoId);
+    if (error) throw error;
+  }
+
+  if (cursos.length > 0) {
+    const { error } = await cliente.from("cursos").insert(
+      cursos.map((curso) => ({
+        alumno_id: alumnoId,
+        nombre: curso.nombre,
+        dia: curso.dias[0],
+        inicio: curso.inicio,
+        fin: curso.fin,
+      })),
+    );
+    if (error) throw error;
+  }
+
+  if (trabajo) {
+    const { error } = await cliente.from("trabajo").insert({
+      alumno_id: alumnoId,
+      dias: trabajo.dias,
+      inicio: trabajo.inicio,
+      fin: trabajo.fin,
+    });
+    if (error) throw error;
+  }
+
+  if (tareas.length > 0) {
+    const { error } = await cliente.from("tareas").insert(
+      tareas.map((tarea) => ({ alumno_id: alumnoId, ...tarea })),
+    );
+    if (error) throw error;
+  }
+}
+
+async function cargarHorario(alumnoId) {
+  const [cursosRes, trabajoRes, tareasRes] = await Promise.all([
+    cliente.from("cursos").select("nombre, dia, inicio, fin").eq("alumno_id", alumnoId).order("inicio"),
+    cliente.from("trabajo").select("dias, inicio, fin").eq("alumno_id", alumnoId).maybeSingle(),
+    cliente.from("tareas").select("titulo, tipo, fecha").eq("alumno_id", alumnoId).order("fecha"),
+  ]);
+  for (const res of [cursosRes, trabajoRes, tareasRes]) {
+    if (res.error) throw res.error;
+  }
+  return { cursos: cursosRes.data, trabajo: trabajoRes.data, tareas: tareasRes.data };
+}
+
+formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
+  mensajeError.hidden = true;
 
   const cursos = [...listaCursos.querySelectorAll(".curso")].map((tarjeta) => ({
     nombre: tarjeta.querySelector(".curso-nombre").value.trim(),
@@ -175,8 +234,15 @@ formulario.addEventListener("submit", (evento) => {
     fecha: tarjeta.querySelector(".tarea-fecha").value,
   }));
 
-  localStorage.setItem("horario", JSON.stringify({ cursos, trabajo, tareas }));
-  window.location.href = "dashboard.html";
+  try {
+    const alumno = await obtenerAlumno();
+    await reemplazarHorario(alumno.id, cursos, trabajo, tareas);
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    console.error(error);
+    mensajeError.textContent = "No se pudo guardar tu horario. Intenta de nuevo.";
+    mensajeError.hidden = false;
+  }
 });
 
 formulario.addEventListener("change", (evento) => {
@@ -204,9 +270,40 @@ document.getElementById("agregar-tarea").addEventListener("click", () => {
   listaTareas.appendChild(crearTarea());
 });
 
-const nombre = localStorage.getItem("nombreAlumno");
-document.getElementById("saludo").textContent = nombre ? `Hola, ${nombre}` : "Hola";
+async function iniciar() {
+  const alumno = await obtenerAlumno();
+  if (!alumno) {
+    window.location.href = "registro.html";
+    return;
+  }
+  saludo.textContent = `Hola, ${alumno.nombre}`;
 
-listaCursos.appendChild(crearCurso());
-listaTareas.appendChild(crearTarea());
-document.getElementById("dias-trabajo").appendChild(crearSelectorDias());
+  const { cursos, trabajo, tareas } = await cargarHorario(alumno.id);
+
+  for (const curso of cursos) {
+    listaCursos.appendChild(crearCurso({
+      nombre: curso.nombre,
+      dias: [curso.dia],
+      inicio: curso.inicio.slice(0, 5),
+      fin: curso.fin.slice(0, 5),
+    }));
+  }
+  if (cursos.length === 0) listaCursos.appendChild(crearCurso());
+
+  if (trabajo) {
+    tieneTrabajo.checked = true;
+    camposTrabajo.hidden = false;
+    document.getElementById("trabajo-inicio").value = trabajo.inicio.slice(0, 5);
+    document.getElementById("trabajo-fin").value = trabajo.fin.slice(0, 5);
+  }
+  document.getElementById("dias-trabajo").appendChild(crearSelectorDias(trabajo?.dias));
+
+  for (const tarea of tareas) listaTareas.appendChild(crearTarea(tarea));
+  if (tareas.length === 0) listaTareas.appendChild(crearTarea());
+}
+
+iniciar().catch((error) => {
+  console.error(error);
+  mensajeError.textContent = "No se pudieron cargar tus datos. Recarga la página.";
+  mensajeError.hidden = false;
+});

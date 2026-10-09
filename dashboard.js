@@ -3,19 +3,17 @@ const FIN_DIA = 22 * 60;
 
 const CLAVES_DIA = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
 
-function leerHorario() {
-  const guardado = localStorage.getItem("horario");
-  return guardado ? JSON.parse(guardado) : null;
-}
+let alumnoId = null;
+let cursos = [];
+let trabajo = null;
+let entregables = [];
 
 function horarioDeHoy() {
-  const horario = leerHorario();
-  if (!horario) return null;
+  if (cursos.length === 0 && !trabajo) return null;
 
-  const { cursos, trabajo } = horario;
   const clave = CLAVES_DIA[new Date().getDay()];
   const bloques = cursos
-    .filter((curso) => curso.dias.includes(clave))
+    .filter((curso) => curso.dia === clave)
     .map((curso) => ({ tipo: "clase", nombre: curso.nombre, inicio: curso.inicio, fin: curso.fin }));
 
   if (trabajo && trabajo.dias.includes(clave)) {
@@ -23,8 +21,6 @@ function horarioDeHoy() {
   }
   return bloques;
 }
-
-let entregables = leerHorario()?.tareas ?? [];
 
 function aMinutos(hora) {
   const [horas, minutos] = hora.split(":").map(Number);
@@ -100,12 +96,6 @@ function textoVencimiento(dias) {
   return `Vence en ${dias} días`;
 }
 
-function guardarTareas() {
-  const horario = leerHorario() ?? { cursos: [], trabajo: null, tareas: [] };
-  horario.tareas = entregables;
-  localStorage.setItem("horario", JSON.stringify(horario));
-}
-
 function renderEntregables() {
   const lista = document.getElementById("lista-entregables");
   lista.replaceChildren();
@@ -157,25 +147,64 @@ document.getElementById("boton-agregar").addEventListener("click", () => {
 
 document.getElementById("cancelar").addEventListener("click", () => dialogo.close());
 
-formulario.addEventListener("submit", (evento) => {
+formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
-  entregables.push({
+  const nueva = {
+    alumno_id: alumnoId,
     tipo: document.getElementById("tipo").value,
     titulo: document.getElementById("titulo").value.trim(),
     fecha: document.getElementById("fecha-limite").value,
-  });
-  guardarTareas();
+  };
+
+  const { data, error } = await cliente
+    .from("tareas")
+    .insert(nueva)
+    .select("tipo, titulo, fecha")
+    .single();
+  if (error) {
+    console.error(error);
+    alert("No se pudo guardar la tarea. Intenta de nuevo.");
+    return;
+  }
+
+  entregables.push(data);
   renderEntregables();
   dialogo.close();
 });
 
-const nombre = localStorage.getItem("nombreAlumno");
-document.getElementById("saludo").textContent = nombre ? `Hola, ${nombre}` : "Hola, estudiante";
+async function iniciar() {
+  const alumno = await obtenerAlumno();
+  if (!alumno) {
+    window.location.href = "registro.html";
+    return;
+  }
+  alumnoId = alumno.id;
+  document.getElementById("saludo").textContent = `Hola, ${alumno.nombre}`;
+
+  const [cursosRes, trabajoRes, tareasRes] = await Promise.all([
+    cliente.from("cursos").select("nombre, dia, inicio, fin").eq("alumno_id", alumnoId).order("inicio"),
+    cliente.from("trabajo").select("dias, inicio, fin").eq("alumno_id", alumnoId).maybeSingle(),
+    cliente.from("tareas").select("tipo, titulo, fecha").eq("alumno_id", alumnoId).order("fecha"),
+  ]);
+  for (const res of [cursosRes, trabajoRes, tareasRes]) {
+    if (res.error) throw res.error;
+  }
+
+  cursos = cursosRes.data;
+  trabajo = trabajoRes.data;
+  entregables = tareasRes.data;
+
+  renderCargaDelDia();
+  renderEntregables();
+}
+
 document.getElementById("fecha").textContent = new Date().toLocaleDateString("es", {
   weekday: "long",
   day: "numeric",
   month: "long",
 });
 
-renderCargaDelDia();
-renderEntregables();
+iniciar().catch((error) => {
+  console.error(error);
+  document.getElementById("horas-libres").textContent = "No se pudieron cargar tus datos. Recarga la página.";
+});

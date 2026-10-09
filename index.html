@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="bienvenida">
+  <main class="bienvenida ancho">
     <p class="institucion">Universidad César Vallejo</p>
     <h1 class="titulo-grande">Bienvenido/a</h1>
     <p class="subtitulo">Tu espacio universitario en un solo lugar</p>
@@ -15,6 +15,32 @@
       <a class="boton boton-principal" href="registro.html">Ir al aula virtual</a>
       <a class="boton boton-secundario" href="#">Conoce nuestra historia</a>
     </div>
+    <section class="datos">
+      <p id="sin-sesion" class="sin-sesion" hidden>
+        Inicia sesión para ver la información que guardaste.
+        <a href="registro.html">Ir a iniciar sesión</a>
+      </p>
+      <div id="contenido-datos" hidden>
+        <h2>Mis cursos</h2>
+        <table class="tabla">
+          <thead><tr><th>Curso</th><th>Día</th><th>Inicio</th><th>Fin</th></tr></thead>
+          <tbody id="tabla-cursos"></tbody>
+        </table>
+
+        <h2>Jornada laboral</h2>
+        <table class="tabla">
+          <thead><tr><th>Días</th><th>Inicio</th><th>Fin</th></tr></thead>
+          <tbody id="tabla-trabajo"></tbody>
+        </table>
+
+        <h2>Tareas pendientes</h2>
+        <table class="tabla">
+          <thead><tr><th>Tarea</th><th>Tipo</th><th>Fecha límite</th></tr></thead>
+          <tbody id="tabla-tareas"></tbody>
+        </table>
+      </div>
+    </section>
+
     <div class="redes">
       <a class="red" href="#" target="_blank" rel="noopener">Facebook</a>
       <a class="red" href="#" target="_blank" rel="noopener">Instagram</a>
@@ -22,5 +48,8 @@
       <a class="red" href="#" target="_blank" rel="noopener">YouTube</a>
     </div>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-cliente.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>

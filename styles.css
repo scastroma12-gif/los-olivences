@@ -42,6 +42,47 @@ body {
   line-height: 1.1;
 }
 
+.bienvenida.ancho {
+  max-width: 720px;
+}
+
+.datos {
+  margin: 2rem 0 1rem;
+  text-align: left;
+}
+
+.datos h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.sin-sesion {
+  margin: 0 0 1rem;
+  text-align: center;
+  color: #4a5568;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #eef1f7;
+  text-align: left;
+}
+
+.tabla th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #4a5568;
+}
+
 .bienvenida .subtitulo {
   margin: 0.5rem 0 1.5rem;
   font-size: 0.95rem;
@@ -120,6 +161,16 @@ body {
   margin-top: 0.5rem;
   border: none;
   font-size: 1rem;
+  cursor: pointer;
+}
+
+.enlace {
+  margin-top: 1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  color: #1f4fd8;
   cursor: pointer;
 }
 
